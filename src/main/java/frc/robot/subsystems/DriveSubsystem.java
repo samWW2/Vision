@@ -40,23 +40,21 @@ public class DriveSubsystem extends SubsystemBase {
   private double factor = (((8.45 * 15.24)/10000))*2.9;
   private final AHRS gyro = new AHRS(SPI.Port.kMXP);
   private final double start_angel = 148;
-  private DifferentialDriveOdometry m_odometry;
+  private final DifferentialDriveOdometry m_odometry;
 
 
 
 
   //similar to the init call
   public DriveSubsystem() {
-    final Pose2d startPos = new Pose2d();
-    m_odometry = new DifferentialDriveOdometry(
-      gyro.getRotation2d(),
-      leftEncoder.getPosition(),
-      rightEncoder.getPosition(),
-      startPos);
-    rightMotor1 .setInverted(true);
+    rightMotor1.setInverted(true );
     rightMotor2.setInverted(true);
     rightEncoder.setPositionConversionFactor(factor);
     leftEncoder.setPositionConversionFactor(factor);
+    resetEncoders();
+    m_odometry =
+    new DifferentialDriveOdometry(
+        gyro.getRotation2d(), leftEncoder.getPosition(), rightEncoder.getPosition());
    
   }
 
@@ -75,7 +73,7 @@ public class DriveSubsystem extends SubsystemBase {
   
   }
   public DifferentialDriveWheelSpeeds getWheelSpeeds() {
-    return new DifferentialDriveWheelSpeeds(leftEncoder.getPositionConversionFactor(), rightEncoder.getPositionConversionFactor()); //change this to get rate
+    return new DifferentialDriveWheelSpeeds(leftEncoder.getMeasurementPeriod(), rightEncoder.getMeasurementPeriod()); //change this to get rate
   }
   public void setMotors(double leftSpeed, double rightSpeed) {
     m_left.set(leftSpeed);
@@ -98,7 +96,6 @@ public Pose2d getPose() {
 
   @Override
   public void simulationPeriodic() {
-    // This method will be called once per scheduler run during simulation
   }
   public CANSparkMax getRightMotor1(){
     return this.rightMotor1;
